@@ -4,7 +4,7 @@ A new Flutter project.
 
 ## Objective
 
-To build an app that uses a basic API to fetch details regarding Covid19.
+To build an app that uses a basic API to fetch details regarding Covid19 and visually display on the screen.
 
 ## Api
 
