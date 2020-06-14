@@ -8,7 +8,7 @@ class API {
   final int cases;
   final int todayCases;
   final int deaths;
-  final int todayDeaths;
+  final int todayDeath;
   final int todayRecovered;
   final int active;
 
@@ -17,7 +17,7 @@ class API {
       this.cases,
       this.deaths,
       this.todayCases,
-      this.todayDeaths,
+      this.todayDeath,
       this.todayRecovered,
       this.updated});
 
@@ -27,7 +27,7 @@ class API {
       cases: json['cases'],
       todayCases: json['todayCases'],
       deaths: json['deaths'],
-      todayDeaths: json['todayDeaths'],
+      todayDeath: json['todayDeaths'],
       todayRecovered: json['todayRecovered'],
       active: json['active'],
     );
@@ -96,7 +96,7 @@ class _HttpfetchAPIState extends State<HttpfetchAPI> {
                         children: [
                           Text('Total Deaths'),
                           SizedBox(width: 10.0),
-                          Text(snapshot.data.todayDeaths.toString())
+                          Text(snapshot.data.todayDeath.toString())
                         ],
                       ),
                     ],
