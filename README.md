@@ -13,8 +13,8 @@ To build an app that uses a basic API to fetch details regarding Covid19 and vis
 
 ## UI
 
-![Landing Page](Images/Landing Page.png)
-![Daily Cases Page](Images/Daily Cases Page.png)
+- ![LandingPage](Images\LandingPage.png)
+- ![DailyCasesPage](Images\DailyCasesPage.png)
 
 ## Contributing
 
