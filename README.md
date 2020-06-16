@@ -11,6 +11,11 @@ To build an app that uses a basic API to fetch details regarding Covid19 and vis
 - [Docs](https://disease.sh/docs/)
 - [API](https://disease.sh/v2/all)
 
+## UI
+
+![Landing Page](Images/Landing Page.png)
+![Daily Cases Page](Images/Daily Cases Page.png)
+
 ## Contributing
 
-Read the [Guide]() to understand the workflow to contributing to this project
+Read the [Guide](CONTRIBUTING.md) to understand the workflow to contributing to this project
