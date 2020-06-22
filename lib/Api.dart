@@ -11,6 +11,8 @@ class API {
   final int todayDeath;
   final int todayRecovered;
   final int active;
+  final int recovered;
+  final int critical;
 
   API(
       {this.active,
@@ -18,16 +20,20 @@ class API {
       this.deaths,
       this.todayCases,
       this.todayDeath,
+        this.recovered,
+        this.critical,
       this.todayRecovered,
       this.updated});
 
   factory API.fromJson(Map<String, dynamic> json) {
     return API(
-      updated: json['updated'],
+      updated: json['updated']as int ,
       cases: json['cases'],
       todayCases: json['todayCases'],
-      deaths: json['deaths'],
+      deaths: json['deaths'] as int ,
       todayDeath: json['todayDeaths'],
+      recovered: json['recovered'] as int,
+      critical: json['critical'] as int,
       todayRecovered: json['todayRecovered'],
       active: json['active'],
     );
