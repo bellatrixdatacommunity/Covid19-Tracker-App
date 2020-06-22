@@ -7,6 +7,7 @@ import 'package:intl/intl.dart';
 import 'Api.dart';
 import 'package:http/http.dart' as http;
 
+
 void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
@@ -64,7 +65,6 @@ class _MyHomePageState extends State<MyHomePage> {
     super.initState();
     _futureAPI = fetchApi();
   }
-
   @override
   Widget build(BuildContext context) {
     // This method is rerun every time setState is called, for instance as done
