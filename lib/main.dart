@@ -1,7 +1,12 @@
+import 'dart:convert';
+
 import 'package:bordered_text/bordered_text.dart';
 import 'package:covid_tracker/daily_cases.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'Api.dart';
+import 'package:http/http.dart' as http;
+
 
 void main() => runApp(MyApp());
 
@@ -10,12 +15,27 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'Flutter Demo',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
       home: MyHomePage(title: "Covid-19 Tracker APP"),
     );
+  }
+}
+
+Future<API> fetchApi() async {
+  final response = await http.get('https://disease.sh/v2/all');
+
+  if (response.statusCode == 200) {
+    // If the server did return a 200 OK response,
+    // then parse the JSON.
+    return API.fromJson(json.decode(response.body));
+  } else {
+    // If the server did not return a 200 OK response,
+    // then throw an exception.
+    throw Exception('Failed to load album');
   }
 }
 
@@ -38,6 +58,13 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  Future<API> _futureAPI;
+
+  @override
+  void initState() {
+    super.initState();
+    _futureAPI = fetchApi();
+  }
   @override
   Widget build(BuildContext context) {
     // This method is rerun every time setState is called, for instance as done
@@ -60,8 +87,13 @@ class _MyHomePageState extends State<MyHomePage> {
 
         appBar: AppBar(
           actions: <Widget>[
-            IconButton(                      // refresh button 
-                onPressed: null,              // set state to fetch data from API
+            IconButton(
+                // refresh button
+                onPressed: () {
+                  setState(() {
+                    _futureAPI = fetchApi();
+                  });
+                }, // set state to fetch data from API
                 icon: Icon(
                   Icons.refresh,
                   color: Color(0xFF526EFA),
@@ -71,285 +103,342 @@ class _MyHomePageState extends State<MyHomePage> {
           backgroundColor: Colors.transparent,
           elevation: 0.0,
         ),
-        body: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            SizedBox(
-              width: width * 0.9,
-              height: height * 0.15,
-              child: Column(  // contains date and other data on top right
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: <Widget>[
-                  Text(
-                    formattedDate,   // to display system date
-                    style: TextStyle(fontSize: 12, color: Color(0xFF526EFA)),
-                  ),
-                  BorderedText(
-                    strokeWidth: 2,
-                    strokeColor: Colors.white,
-                    child: Text(
-                      "Corona Virus Cases",  
-                      style: TextStyle(fontSize: 17, color: Color(0xFF526EFA)),
-                    ),
-                  ),
-                  BorderedText(
-                    strokeWidth: 2,
-                    strokeColor: Colors.white,
-                    child: Text(
-                      "316,067",
-                      style: TextStyle(
-                        fontSize: 38,
-                        fontWeight: FontWeight.w700,
-                        color: Color(0xFF526EFA),
-                      ),
-                    ),
-                  )
-                ],
-              ),
-            ),
-            Row(                                      // for first two cards
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                Card(                                  // Death Card
-                  color: Colors.white,
-                  child: Container(
-                      padding: EdgeInsets.all(14),
-                      width: width * 0.4,
-                      height: height * 0.2,
+        body: Center(
+          child: FutureBuilder<API>(
+              future: _futureAPI,
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  return Container(
+                    child: Center(
                       child: Column(
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        children: <Widget>[
-                          Text(
-                            "DEATHS",
-                            textAlign: TextAlign.left,
-                            style: TextStyle(
-                              color: Colors.black54,
-                              fontSize: 16,
-                            ),
-                          ),
-                          Text("13,598",
-                              style:
-                                  TextStyle(color: Colors.red, fontSize: 30)),
-                          Icon(Icons.mood_bad, color: Colors.red)
-                        ],
-                      )),
-                ),
-                Card(                                // recovered card
-                  color: Colors.white,
-                  child: Container(
-                      padding: EdgeInsets.all(14),
-                      width: width * 0.4,
-                      height: height * 0.2,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        children: <Widget>[
-                          Text(
-                            "RECOVERED",
-                            textAlign: TextAlign.left,
-                            style: TextStyle(
-                              color: Colors.black54,
-                              fontSize: 16,
-                            ),
-                          ),
-                          Text("95,892",           // recovered cases number
-                              style:
-                                  TextStyle(color: Colors.green, fontSize: 30)),
-                          Icon(Icons.mood, color: Colors.green)
-                        ],
-                      )),
-                ),
-              ],
-            ),
-            Card(                                     // active cases card
-              color: Colors.white,
-              child: Container(
-                  padding: EdgeInsets.only(top: 12, bottom: 9),
-                  width: width * 0.84,
-                  height: height * 0.16,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: <Widget>[
-                      Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: <Widget>[
                           SizedBox(
-                            width: width * 0.35,
-                            child: Text(
-                              "ACTIVE CASES",
-                              textAlign: TextAlign.left,
-                              style: TextStyle(
-                                color: Colors.black54,
-                                fontSize: 13,
-                              ),
-                            ),
-                          ),
-                          SizedBox(
-                            width: width * 0.35,
-                            child:
+                            width: width * 0.9,
+                            height: height * 0.15,
+                            child: Column(
+                              // contains date and other data on top right
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              children: <Widget>[
                                 Text(
-                                  "206,598",                         // number of active cases 
-                                style: TextStyle(fontSize: 30)),
-                          ),
-                        ],
-                      ),
-                      Column(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: <Widget>[
-                          Row(
-                            children: <Widget>[
-                              Icon(
-                                Icons.arrow_downward,
-                                color: Colors.green,
-                              ),
-                              Column(                          // mild condition
-                                children: <Widget>[
-                                  SizedBox(
-                                    width: width * 0.35,
-                                    child: Text("95%",                   // mild condition percentage
-                                        style: TextStyle(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.w800)),
+                                  formattedDate, // to display system date
+                                  style: TextStyle(
+                                      fontSize: 12, color: Color(0xFF526EFA)),
+                                ),
+                                BorderedText(
+                                  strokeWidth: 2,
+                                  strokeColor: Colors.white,
+                                  child: Text(
+                                    "Corona Virus Cases",
+                                    style: TextStyle(
+                                        fontSize: 17, color: Color(0xFF526EFA)),
                                   ),
-                                  SizedBox(
-                                    width: width * 0.35,
-                                    child: Text(
-                                      "Mild Condition",                      
-                                      textAlign: TextAlign.left,
-                                      style: TextStyle(color: Colors.black45),
+                                ),
+                                BorderedText(
+                                  strokeWidth: 2,
+                                  strokeColor: Colors.white,
+                                  child: Text(
+                                    snapshot.data.cases.toString(),
+                                    style: TextStyle(
+                                      fontSize: 38,
+                                      fontWeight: FontWeight.w700,
+                                      color: Color(0xFF526EFA),
                                     ),
-                                  )
-                                ],
-                              )
-                            ],
-                          ),
-                          Row(                                      // critical cases
-                            children: <Widget>[
-                              Icon(
-                                Icons.arrow_upward,
-                                color: Colors.red,
-                              ),
-                              Column(
-                                children: <Widget>[
-                                  SizedBox(
-                                    width: width * 0.35,
-                                    child: Text("5%",                    //critical cases percentage
-                                        style: TextStyle(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.w800)),
                                   ),
-                                  SizedBox(
-                                    width: width * 0.35,
-                                    child: Text(
-                                      "Critical",
-                                      textAlign: TextAlign.left,
-                                      style: TextStyle(color: Colors.black45),
-                                    ),
-                                  )
-                                ],
-                              )
-                            ],
-                          )
-                        ],
-                      )
-                    ],
-                  )),
-            ),
-            Card(                           //closed cases card
-              color: Colors.white,
-              child: Container(
-                  padding: EdgeInsets.only(top: 12, bottom: 9),
-                  width: width * 0.84,
-                  height: height * 0.16,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: <Widget>[
-                      Column(
-                        children: <Widget>[
-                          SizedBox(
-                            width: width * 0.35,
-                            child: Text(
-                              "CLOSED CASES",         
-                              textAlign: TextAlign.left,
-                              style: TextStyle(
-                                color: Colors.black54,
-                                fontSize: 13,
-                              ),
+                                )
+                              ],
                             ),
                           ),
-                          SizedBox(
-                            width: width * 0.35,
-                            child:
-                                Text("109,490", style: TextStyle(fontSize: 30)),     //number of closed cases
+                          Row(
+                            // for first two cards
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: <Widget>[
+                              Card(
+                                // Death Card
+                                color: Colors.white,
+                                child: Container(
+                                    padding: EdgeInsets.all(14),
+                                    width: width * 0.4,
+                                    height: height * 0.2,
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceAround,
+                                      children: <Widget>[
+                                        Text(
+                                          "DEATHS",
+                                          textAlign: TextAlign.left,
+                                          style: TextStyle(
+                                            color: Colors.black54,
+                                            fontSize: 16,
+                                          ),
+                                        ),
+                                        Text(snapshot.data.deaths.toString(),
+                                            style: TextStyle(
+                                                color: Colors.red,
+                                                fontSize: 30)),
+                                        Icon(Icons.mood_bad, color: Colors.red)
+                                      ],
+                                    )),
+                              ),
+                              Card(
+                                // recovered card
+                                color: Colors.white,
+                                child: Container(
+                                    padding: EdgeInsets.all(14),
+                                    width: width * 0.4,
+                                    height: height * 0.2,
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceAround,
+                                      children: <Widget>[
+                                        Text(
+                                          "RECOVERED",
+                                          textAlign: TextAlign.left,
+                                          style: TextStyle(
+                                            color: Colors.black54,
+                                            fontSize: 16,
+                                          ),
+                                        ),
+                                        Text(
+                                            snapshot.data.recovered
+                                                .toString(), // recovered cases number
+                                            style: TextStyle(
+                                                color: Colors.green,
+                                                fontSize: 30)),
+                                        Icon(Icons.mood, color: Colors.green)
+                                      ],
+                                    )),
+                              ),
+                            ],
+                          ),
+                          Card(
+                            // active cases card
+                            color: Colors.white,
+                            child: Container(
+                                padding: EdgeInsets.only(top: 12, bottom: 9),
+                                width: width * 0.84,
+                                height: height * 0.16,
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceAround,
+                                  children: <Widget>[
+                                    Column(
+                                      children: <Widget>[
+                                        SizedBox(
+                                          width: width * 0.35,
+                                          child: Text(
+                                            "ACTIVE CASES",
+                                            textAlign: TextAlign.left,
+                                            style: TextStyle(
+                                              color: Colors.black54,
+                                              fontSize: 13,
+                                            ),
+                                          ),
+                                        ),
+                                        SizedBox(
+                                          width: width * 0.35,
+                                          child: Text(
+                                              snapshot.data.active
+                                                  .toString(), // number of active cases
+                                              style: TextStyle(fontSize: 30)),
+                                        ),
+                                      ],
+                                    ),
+                                    Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: <Widget>[
+                                        Row(
+                                          children: <Widget>[
+                                            Icon(
+                                              Icons.arrow_downward,
+                                              color: Colors.green,
+                                            ),
+                                            Column(
+                                              // mild condition
+                                              children: <Widget>[
+                                                SizedBox(
+                                                  width: width * 0.35,
+                                                  child: Text(
+                                                      "95%", // mild condition percentage
+                                                      style: TextStyle(
+                                                          fontSize: 16,
+                                                          fontWeight:
+                                                              FontWeight.w800)),
+                                                ),
+                                                SizedBox(
+                                                  width: width * 0.35,
+                                                  child: Text(
+                                                    "Mild Condition",
+                                                    textAlign: TextAlign.left,
+                                                    style: TextStyle(
+                                                        color: Colors.black45),
+                                                  ),
+                                                )
+                                              ],
+                                            )
+                                          ],
+                                        ),
+                                        Row(
+                                          // critical cases
+                                          children: <Widget>[
+                                            Icon(
+                                              Icons.arrow_upward,
+                                              color: Colors.red,
+                                            ),
+                                            Column(
+                                              children: <Widget>[
+                                                SizedBox(
+                                                  width: width * 0.35,
+                                                  child: Text(
+                                                      "5%", //critical cases percentage
+                                                      style: TextStyle(
+                                                          fontSize: 16,
+                                                          fontWeight:
+                                                              FontWeight.w800)),
+                                                ),
+                                                SizedBox(
+                                                  width: width * 0.35,
+                                                  child: Text(
+                                                    "Critical",
+                                                    textAlign: TextAlign.left,
+                                                    style: TextStyle(
+                                                        color: Colors.black45),
+                                                  ),
+                                                )
+                                              ],
+                                            )
+                                          ],
+                                        )
+                                      ],
+                                    )
+                                  ],
+                                )),
+                          ),
+                          Card(
+                            //closed cases card
+                            color: Colors.white,
+                            child: Container(
+                                padding: EdgeInsets.only(top: 12, bottom: 9),
+                                width: width * 0.84,
+                                height: height * 0.16,
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceAround,
+                                  children: <Widget>[
+                                    Column(
+                                      children: <Widget>[
+                                        SizedBox(
+                                          width: width * 0.35,
+                                          child: Text(
+                                            "CLOSED CASES",
+                                            textAlign: TextAlign.left,
+                                            style: TextStyle(
+                                              color: Colors.black54,
+                                              fontSize: 13,
+                                            ),
+                                          ),
+                                        ),
+                                        SizedBox(
+                                          width: width * 0.35,
+                                          child: Text(
+                                              NumberFormat.compact()
+                                                  .format((snapshot
+                                                          .data.updated -
+                                                      (snapshot.data.deaths +
+                                                          snapshot
+                                                              .data.recovered)))
+                                                  .toString(),
+                                              style: TextStyle(
+                                                  fontSize:
+                                                      30)), //number of closed cases
+                                        ),
+                                      ],
+                                    ),
+                                    Column(
+                                      //recovered cases
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: <Widget>[
+                                        Row(
+                                          children: <Widget>[
+                                            Icon(
+                                              Icons.arrow_downward,
+                                              color: Colors.green,
+                                            ),
+                                            Column(
+                                              children: <Widget>[
+                                                SizedBox(
+                                                  width: width * 0.35,
+                                                  child: Text(
+                                                      "88%", //percentage of recovered cases
+                                                      style: TextStyle(
+                                                          fontSize: 16,
+                                                          fontWeight:
+                                                              FontWeight.w800)),
+                                                ),
+                                                SizedBox(
+                                                  width: width * 0.35,
+                                                  child: Text(
+                                                    "Recovered",
+                                                    textAlign: TextAlign.left,
+                                                    style: TextStyle(
+                                                        color: Colors.black45),
+                                                  ),
+                                                )
+                                              ],
+                                            )
+                                          ],
+                                        ),
+                                        Row(
+                                          // deaths
+                                          children: <Widget>[
+                                            Icon(
+                                              Icons.arrow_upward,
+                                              color: Colors.red,
+                                            ),
+                                            Column(
+                                              children: <Widget>[
+                                                SizedBox(
+                                                  width: width * 0.35,
+                                                  child: Text(
+                                                      "12%", // percentage death
+                                                      style: TextStyle(
+                                                          fontSize: 16,
+                                                          fontWeight:
+                                                              FontWeight.w800)),
+                                                ),
+                                                SizedBox(
+                                                  width: width * 0.35,
+                                                  child: Text(
+                                                    "Deaths",
+                                                    textAlign: TextAlign.left,
+                                                    style: TextStyle(
+                                                        color: Colors.black45),
+                                                  ),
+                                                )
+                                              ],
+                                            )
+                                          ],
+                                        )
+                                      ],
+                                    )
+                                  ],
+                                )),
                           ),
                         ],
                       ),
-                      Column(                          //recovered cases
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: <Widget>[
-                          Row(
-                            children: <Widget>[
-                              Icon(
-                                Icons.arrow_downward,
-                                color: Colors.green,
-                              ),
-                              Column(
-                                children: <Widget>[
-                                  SizedBox(
-                                    width: width * 0.35,
-                                    child: Text("88%",                //percentage of recovered cases
-                                        style: TextStyle(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.w800)),
-                                  ),
-                                  SizedBox(
-                                    width: width * 0.35,
-                                    child: Text(
-                                      "Recovered",
-                                      textAlign: TextAlign.left,
-                                      style: TextStyle(color: Colors.black45),
-                                    ),
-                                  )
-                                ],
-                              )
-                            ],
-                          ),
-                          Row(                                // deaths
-                            children: <Widget>[
-                              Icon(
-                                Icons.arrow_upward,
-                                color: Colors.red,
-                              ),
-                              Column(
-                                children: <Widget>[
-                                  SizedBox(
-                                    width: width * 0.35,
-                                    child: Text("12%",               // percentage death
-                                        style: TextStyle(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.w800)),
-                                  ),
-                                  SizedBox(
-                                    width: width * 0.35,
-                                    child: Text(
-                                      "Deaths",
-                                      textAlign: TextAlign.left,
-                                      style: TextStyle(color: Colors.black45),
-                                    ),
-                                  )
-                                ],
-                              )
-                            ],
-                          )
-                        ],
-                      )
-                    ],
-                  )),
-            ),
-          ],
+                    ),
+                  );
+                } else if (snapshot.hasError) return Text("${snapshot.error}");
+                return CircularProgressIndicator();
+              }),
         ),
         floatingActionButton: Container(
             height: 40,
             width: 180,
-            child: FloatingActionButton.extended(                        //button to move to daily cases page
+            child: FloatingActionButton.extended(
+              //button to move to daily cases page
               onPressed: () {
                 Navigator.push(context,
                     MaterialPageRoute(builder: (context) => DailyCases()));
