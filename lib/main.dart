@@ -1,12 +1,10 @@
 import 'dart:convert';
-
 import 'package:bordered_text/bordered_text.dart';
 import 'package:covid_tracker/daily_cases.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'Api.dart';
 import 'package:http/http.dart' as http;
-
 
 void main() => runApp(MyApp());
 
@@ -17,10 +15,18 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Flutter Demo',
+      initialRoute: '/',
+    routes: {
+      // When navigating to the "/" route, build the FirstScreen widget.
+      '/': (context) => MyHomePage(),
+      // When navigating to the "/second" route, build the SecondScreen widget.
+      '/second': (context) => DailyCases(),
+    },
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: MyHomePage(title: "Covid-19 Tracker APP"),
+      
+
     );
   }
 }
@@ -65,6 +71,7 @@ class _MyHomePageState extends State<MyHomePage> {
     super.initState();
     _futureAPI = fetchApi();
   }
+
   @override
   Widget build(BuildContext context) {
     // This method is rerun every time setState is called, for instance as done
@@ -73,7 +80,7 @@ class _MyHomePageState extends State<MyHomePage> {
     var height = MediaQuery.of(context).size.height;
 
     DateTime now = DateTime.now();
-    String formattedDate = DateFormat('dd/mm/yy kk:mm:ss').format(now);
+    String formattedDate = DateFormat.yMMMd().add_jm().format(now);
 
     return Container(
       decoration: BoxDecoration(
@@ -172,10 +179,16 @@ class _MyHomePageState extends State<MyHomePage> {
                                             fontSize: 16,
                                           ),
                                         ),
-                                        Text(snapshot.data.deaths.toString(),
+                                        Container(
+                                          width: width * 0.4,
+                                          child: Text(
+                                            snapshot.data.deaths.toString(),
                                             style: TextStyle(
-                                                color: Colors.red,
-                                                fontSize: 30)),
+                                              color: Colors.red,
+                                            ),
+                                            textAlign: TextAlign.center,
+                                          ),
+                                        ),
                                         Icon(Icons.mood_bad, color: Colors.red)
                                       ],
                                     )),
@@ -199,12 +212,17 @@ class _MyHomePageState extends State<MyHomePage> {
                                             fontSize: 16,
                                           ),
                                         ),
-                                        Text(
+                                        Container(
+                                          width: width * 0.4,
+                                          child: Text(
                                             snapshot.data.recovered
                                                 .toString(), // recovered cases number
                                             style: TextStyle(
-                                                color: Colors.green,
-                                                fontSize: 30)),
+                                              color: Colors.green,
+                                            ),
+                                            textAlign: TextAlign.center,
+                                          ),
+                                        ),
                                         Icon(Icons.mood, color: Colors.green)
                                       ],
                                     )),
@@ -440,8 +458,7 @@ class _MyHomePageState extends State<MyHomePage> {
             child: FloatingActionButton.extended(
               //button to move to daily cases page
               onPressed: () {
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => DailyCases()));
+               Navigator.pushNamed(context, '/second');
               },
               label: BorderedText(
                   strokeWidth: 2,
