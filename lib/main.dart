@@ -1,10 +1,9 @@
-import 'dart:convert';
+
 import 'package:bordered_text/bordered_text.dart';
 import 'package:covid_tracker/daily_cases.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'Api.dart';
-import 'package:http/http.dart' as http;
 
 void main() => runApp(MyApp());
 
@@ -31,19 +30,6 @@ class MyApp extends StatelessWidget {
   }
 }
 
-Future<API> fetchApi() async {
-  final response = await http.get('https://disease.sh/v2/all');
-
-  if (response.statusCode == 200) {
-    // If the server did return a 200 OK response,
-    // then parse the JSON.
-    return API.fromJson(json.decode(response.body));
-  } else {
-    // If the server did not return a 200 OK response,
-    // then throw an exception.
-    throw Exception('Failed to load album');
-  }
-}
 
 class MyHomePage extends StatefulWidget {
   MyHomePage({Key key, this.title}) : super(key: key);
