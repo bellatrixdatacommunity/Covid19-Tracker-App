@@ -19,8 +19,8 @@ To build an app that uses a basic API to fetch details regarding Covid19 and vis
     <td>Daily Cases Page</td>
   </tr>
   <tr>
-    <td><img alt="Landing Page" src="Images/Landing&#32;Page.png"  height="600px"></td>
-    <td><img alt="Daily Cases Page" src="Images/Daily&#32;Cases&#32;Page.png"  height="600px"></td>
+    <td><img alt="Landing Page" src="app_ui/screen1.png"  height="600px"></td>
+    <td><img alt="Daily Cases Page" src="app_ui/screen2.png"  height="600px"></td>
   </tr>
 </table>
 
